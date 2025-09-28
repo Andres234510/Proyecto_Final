@@ -1,0 +1,12 @@
+.root {
+    -fx-font-family: "Segoe UI", Arial;
+}
+.title {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+.button {
+    -fx-background-radius: 8px;
+    -fx-padding: 8 12 8 12;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 6, 0, 0, 2);
+}

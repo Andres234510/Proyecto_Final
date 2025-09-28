@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.*?>
+<AnchorPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="co.edu.uniquindio.proyecto_final.controller.LoginController">
+    <children>
+        <VBox layoutX="20" layoutY="20" spacing="10" alignment="CENTER" prefWidth="500" prefHeight="350">
+            <Label text="Plataforma de Logística" styleClass="title"/>
+            <TextField fx:id="nombreField" promptText="Nombre (solo registro)"/>
+            <TextField fx:id="correoField" promptText="Correo"/>
+            <PasswordField fx:id="passwordField" promptText="Contraseña"/>
+            <HBox spacing="10">
+                <Button fx:id="btnLogin" text="Iniciar sesión" onAction="#onLogin"/>
+                <Button fx:id="btnRegister" text="Registrar" onAction="#onRegister"/>
+            </HBox>
+            <Label fx:id="lblMessage" textFill="red"/>
+        </VBox>
+    </children>
+</AnchorPane>
