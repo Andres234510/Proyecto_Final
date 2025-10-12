@@ -4,18 +4,26 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 public class Pago {
-    private String id;
-    private String envioId;
-    private double valor;
+    private String idPago;
+    private String idEnvio;
+    private double monto;
     private LocalDateTime fecha;
+    private String metodo;
+    private ResultadoPago resultado;
 
-    public Pago() { this.id = UUID.randomUUID().toString(); this.fecha = LocalDateTime.now(); }
+    public Pago(String idEnvio, double monto, String metodo, ResultadoPago resultado) {
+        this.idPago = UUID.randomUUID().toString();
+        this.idEnvio = idEnvio;
+        this.monto = monto;
+        this.fecha = LocalDateTime.now();
+        this.metodo = metodo;
+        this.resultado = resultado;
+    }
 
-    // getters/setters
-    public String getId() { return id; }
-    public String getEnvioId() { return envioId; }
-    public void setEnvioId(String envioId) { this.envioId = envioId; }
-    public double getValor() { return valor; }
-    public void setValor(double valor) { this.valor = valor; }
+    public String getIdPago() { return idPago; }
+    public String getIdEnvio() { return idEnvio; }
+    public double getMonto() { return monto; }
     public LocalDateTime getFecha() { return fecha; }
+    public String getMetodo() { return metodo; }
+    public ResultadoPago getResultado() { return resultado; }
 }

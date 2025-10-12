@@ -1,7 +1,15 @@
 package co.edu.uniquindio.proyecto_final.decorator;
 
-public class SeguroDecorator extends TarifaDecorator {
-    public SeguroDecorator(TarifaComponent wrappee) { super(wrappee); }
+public class SeguroDecorator extends EnvioDecorator {
+    public SeguroDecorator(EnvioComponent c) { super(c); }
+
     @Override
-    public double getCosto() { return super.getCosto() + 500; } // recargo fijo
+    public double getCosto() {
+        return componente.getCosto() + 2000;
+    }
+
+    @Override
+    public String getDescripcion() {
+        return componente.getDescripcion() + " + Seguro";
+    }
 }

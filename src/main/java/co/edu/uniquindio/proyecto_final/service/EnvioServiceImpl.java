@@ -1,8 +1,6 @@
 package co.edu.uniquindio.proyecto_final.service;
 
-import co.edu.uniquindio.proyecto_final.decorator.*;
-import co.edu.uniquindio.proyecto_final.model.Envio;
-import co.edu.uniquindio.proyecto_final.model.Repartidor;
+import co.edu.uniquindio.proyecto_final.model.*;
 import co.edu.uniquindio.proyecto_final.repository.EnvioRepository;
 import co.edu.uniquindio.proyecto_final.repository.RepartidorRepository;
 
@@ -15,8 +13,9 @@ public class EnvioServiceImpl implements EnvioService {
     private final RepartidorRepository repartidorRepo;
     private final TarifaService tarifaService;
 
-    public EnvioServiceImpl(EnvioRepository envioRepo, RepartidorRepository repartidorRepo, TarifaService
-            tarifaService) {
+    public EnvioServiceImpl(EnvioRepository envioRepo,
+                            RepartidorRepository repartidorRepo,
+                            TarifaService tarifaService) {
         this.envioRepo = envioRepo;
         this.repartidorRepo = repartidorRepo;
         this.tarifaService = tarifaService;
@@ -24,46 +23,57 @@ public class EnvioServiceImpl implements EnvioService {
 
     @Override
     public Envio crear(Envio envio) {
-        // calcular tarifa por estrategia + decoradores si aplica
-        double base = tarifaService.calcular(envio);
-        // aplicar decoradores: ejemplo seguro + prioridad
-        TarifaComponent tarifa = new BaseTarifa(base);
-        if (envio.isPrioridad()) {
-            tarifa = new PrioridadDecorator(tarifa);
-        }
-        // ejemplo: si volumen > 100 => seguro
-        if (envio.getVolumen() > 100) {
-            tarifa = new SeguroDecorator(tarifa);
-        }
-        envio.setCosto(tarifa.getCosto());
-        envio = envioRepo.save(envio);
-        return envio;
+        double costo = tarifaService.calcularCostoEstimado(envio);
+        envio.setCosto(costo);
+        envio.setEstado(EstadoEnvio.SOLICITADO);
+        return envioRepo.save(envio);
+    }
+
+    public Envio actualizar(Envio envio) {
+        double costo = tarifaService.calcularCostoEstimado(envio);
+        envio.setCosto(costo);
+        return envioRepo.save(envio);
+    }
+
+    public void eliminar(String idEnvio) {
+        envioRepo.delete(idEnvio);
     }
 
     @Override
-    public Optional<Envio> buscar(String id) {
-        return envioRepo.findById(id);
+    public boolean asignarRepartidor(Envio envio) {
+        List<Repartidor> disponibles = repartidorRepo.findByDisponibilidad(Disponibilidad.ACTIVO);
+        if (disponibles == null || disponibles.isEmpty()) return false;
+
+        Repartidor seleccionado = disponibles.get(0);
+        seleccionado.setDisponibilidad(Disponibilidad.EN_RUTA);
+        repartidorRepo.save(seleccionado);
+
+        envio.setRepartidor(seleccionado);
+        envio.setEstado(EstadoEnvio.ASIGNADO);
+        envioRepo.save(envio);
+        return true;
     }
 
     @Override
-    public List<Envio> listarTodos() {
-        return envioRepo.findAll();
+    public void actualizarEstado(String idEnvio, EstadoEnvio nuevoEstado) {
+        envioRepo.findById(idEnvio).ifPresent(e -> { e.setEstado(nuevoEstado); envioRepo.save(e); });
     }
 
     @Override
-    public List<Envio> listarPorUsuario(String usuarioId) {
-        return envioRepo.findByUsuarioId(usuarioId);
-    }
+    public List<Envio> listarPorEstado(EstadoEnvio estado) { return envioRepo.findByEstado(estado); }
 
     @Override
-    public void asignarRepartidor(Envio envio) {
-        Optional<Repartidor> r = repartidorRepo.findAnyAvailable();
-        if (r.isPresent()) {
-            Repartidor repartidor = r.get();
-            repartidor.setDisponible(false);
-            repartidorRepo.save(repartidor);
-            envio.setEstado(co.edu.uniquindio.proyecto_final.model.EstadoEnvio.ASIGNADO);
-            envioRepo.save(envio);
-        }
-    }
+    public Optional<Envio> buscarPorId(String idEnvio) { return envioRepo.findById(idEnvio); }
+
+    @Override
+    public List<Envio> listarTodos() { return envioRepo.findAll(); }
+
+    @Override
+    public void cancelarEnvio(String idEnvio) { /* same as before */ envioRepo.findById(idEnvio).ifPresent(e -> { if (e.getEstado()==EstadoEnvio.SOLICITADO) { e.setEstado(EstadoEnvio.CANCELADO); envioRepo.save(e); } }); }
+
+    @Override
+    public void recalcularCosto(String idEnvio) { envioRepo.findById(idEnvio).ifPresent(envio -> { double nuevoCosto = tarifaService.calcularCostoEstimado(envio); envio.setCosto(nuevoCosto); envioRepo.save(envio); }); }
+
+    @Override
+    public List<Envio> listarPorUsuario(String usuarioId) { return envioRepo.findByUsuarioId(usuarioId); }
 }

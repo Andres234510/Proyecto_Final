@@ -1,28 +1,40 @@
 package co.edu.uniquindio.proyecto_final.model;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class Envio {
-    private String id;
+    private String idEnvio;
     private Direccion origen;
     private Direccion destino;
     private double peso;
     private double volumen;
-    private boolean prioridad;
     private double costo;
     private EstadoEnvio estado;
     private LocalDateTime fechaCreacion;
-    private String usuarioId;
+    private LocalDateTime fechaEstimadaEntrega;
+    private Repartidor repartidor;
+    private Usuario usuario;
+    private List<ServicioAdicional> servicios = new ArrayList<>();
 
     public Envio() {
-        this.id = UUID.randomUUID().toString();
-        this.fechaCreacion = LocalDateTime.now();
+        this.idEnvio = UUID.randomUUID().toString();
         this.estado = EstadoEnvio.SOLICITADO;
+        this.fechaCreacion = LocalDateTime.now();
     }
 
-    // getters y setters
-    public String getId() { return id; }
+    public Envio(String idEnvio, Usuario usuario, Direccion origen, Direccion destino, double peso) {
+        this();
+        if (idEnvio != null) this.idEnvio = idEnvio;
+        this.usuario = usuario;
+        this.origen = origen;
+        this.destino = destino;
+        this.peso = peso;
+    }
+
+    public String getIdEnvio() { return idEnvio; }
     public Direccion getOrigen() { return origen; }
     public void setOrigen(Direccion origen) { this.origen = origen; }
     public Direccion getDestino() { return destino; }
@@ -31,13 +43,28 @@ public class Envio {
     public void setPeso(double peso) { this.peso = peso; }
     public double getVolumen() { return volumen; }
     public void setVolumen(double volumen) { this.volumen = volumen; }
-    public boolean isPrioridad() { return prioridad; }
-    public void setPrioridad(boolean prioridad) { this.prioridad = prioridad; }
     public double getCosto() { return costo; }
     public void setCosto(double costo) { this.costo = costo; }
     public EstadoEnvio getEstado() { return estado; }
     public void setEstado(EstadoEnvio estado) { this.estado = estado; }
     public LocalDateTime getFechaCreacion() { return fechaCreacion; }
-    public String getUsuarioId() { return usuarioId; }
-    public void setUsuarioId(String usuarioId) { this.usuarioId = usuarioId; }
+    public LocalDateTime getFechaEstimadaEntrega() { return fechaEstimadaEntrega; }
+    public void setFechaEstimadaEntrega(LocalDateTime fechaEstimadaEntrega) { this.fechaEstimadaEntrega = fechaEstimadaEntrega; }
+    public Repartidor getRepartidor() { return repartidor; }
+    public void setRepartidor(Repartidor repartidor) { this.repartidor = repartidor; }
+    public Usuario getUsuario() { return usuario; }
+    public void setUsuario(Usuario usuario) { this.usuario = usuario; }
+    public List<ServicioAdicional> getServicios() { return servicios; }
+
+    public void addServicio(ServicioAdicional s) {
+        if (s != null && !servicios.contains(s)) servicios.add(s);
+    }
+
+    public void setUsuarioId(String usuarioId) {
+        if (usuarioId == null) return;
+        this.usuario = new Usuario(usuarioId, "", "");
+    }
+
+    public void setIdEnvio(String id) { this.idEnvio = id; }
+    public void setId(String id) { this.idEnvio = id; }
 }

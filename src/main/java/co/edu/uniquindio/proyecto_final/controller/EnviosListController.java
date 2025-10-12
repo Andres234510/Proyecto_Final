@@ -21,7 +21,7 @@ public class EnviosListController {
     @FXML private Button btnVolver;
 
     private ServiceLocator sl = ServiceLocator.getInstance();
-    private Usuario usuario; // opcional si se filtra
+    private Usuario usuario;
 
     public void setUsuario(Usuario u) { this.usuario = u; loadData(); }
     @FXML
@@ -35,10 +35,10 @@ public class EnviosListController {
     }
 
     private void loadData() {
-        List<Envio> envs = usuario == null ? sl.envioService.listarTodos() : sl.envioService.listarPorUsuario(usuario.getId());
+        List<Envio> envs = usuario == null ? sl.envioService.listarTodos() : sl.envioService.listarPorUsuario(usuario.getIdDireccion());
         List<EnvioDTO> dtos = envs.stream().map(e -> {
             EnvioDTO dto = new EnvioDTO();
-            dto.setId(e.getId());
+            dto.setId(e.getRepartidor().getIdRepartidor());
             dto.setOrigen(e.getOrigen().toString());
             dto.setDestino(e.getDestino().toString());
             dto.setPeso(e.getPeso());

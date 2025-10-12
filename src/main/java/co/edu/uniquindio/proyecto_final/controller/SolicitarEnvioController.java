@@ -48,10 +48,8 @@ public class SolicitarEnvioController {
 
             envio.setUsuarioId(usuario.getId());
 
-            // ejemplo: usar strategy según radio? Por ahora distance
             sl.envioService.crear(envio);
             lblMsg.setText("Envío creado. Costo: " + (int)envio.getCosto());
-            // opcional: asignar
             sl.envioService.asignarRepartidor(envio);
         } catch (Exception ex) {
             lblMsg.setText("Error: datos inválidos");

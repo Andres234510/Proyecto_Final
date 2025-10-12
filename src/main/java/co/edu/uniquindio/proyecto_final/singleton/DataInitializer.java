@@ -7,7 +7,7 @@ import co.edu.uniquindio.proyecto_final.model.Usuario;
 public class DataInitializer {
     public static void init() {
         ServiceLocator sl = ServiceLocator.getInstance();
-        // crear usuarios demo
+
         Usuario admin = new Usuario("Admin", "admin@uniquindio.edu.co", "admin");
         admin.setAdmin(true);
         sl.usuarioRepo.save(admin);
@@ -17,7 +17,6 @@ public class DataInitializer {
         u1.getDirecciones().add(new Direccion("Trabajo", "Av. Centro #10", "Pereira"));
         sl.usuarioRepo.save(u1);
 
-        // repartidores demo
         sl.repartidorRepo.save(new Repartidor("Luis"));
         sl.repartidorRepo.save(new Repartidor("Ana"));
     }
