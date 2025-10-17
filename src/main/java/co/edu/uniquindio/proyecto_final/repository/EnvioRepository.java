@@ -13,4 +13,5 @@ public interface EnvioRepository {
     List<Envio> findByEstado(EstadoEnvio estado);
     List<Envio> findByUsuarioId(String usuarioId);
     void delete(String id);
+    void update(Envio envio);
 }

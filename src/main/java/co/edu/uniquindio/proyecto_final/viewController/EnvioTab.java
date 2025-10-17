@@ -1,9 +1,8 @@
 package co.edu.uniquindio.proyecto_final.viewController;
 
-import co.edu.uniquindio.proyecto_final.model.*;
+import co.edu.uniquindio.proyecto_final.model.Envio;
+import co.edu.uniquindio.proyecto_final.model.Usuario;
 import co.edu.uniquindio.proyecto_final.service.EnvioService;
-import co.edu.uniquindio.proyecto_final.service.RepartidorService;
-import co.edu.uniquindio.proyecto_final.service.TarifaService;
 import co.edu.uniquindio.proyecto_final.singleton.DataStore;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
@@ -11,35 +10,32 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.*;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class EnvioTab {
 
-    public static Tab createTab() {
-        Tab tab = new Tab("Envíos");
+
+    public static Tab createTab(boolean isAdmin) {
+        Tab tab = new Tab(isAdmin ? "Envíos" : "Mis envíos");
         BorderPane root = new BorderPane();
         root.setPadding(new Insets(10));
 
-        DataStore ds = DataStore.getInstance();
-        EnvioService envioService = ds.getEnvioService();
-        TarifaService tarifaService = ds.getTarifaService();
-        RepartidorService repartidorService = ds.getRepartidorService();
+        EnvioService envioService = DataStore.getInstance().getEnvioService();
 
         TableView<Envio> table = new TableView<>();
-        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
+
         TableColumn<Envio, String> idCol = new TableColumn<>("ID");
         idCol.setCellValueFactory(new PropertyValueFactory<>("idEnvio"));
         TableColumn<Envio, String> usuarioCol = new TableColumn<>("Usuario");
-        usuarioCol.setCellValueFactory(cell -> {
-            Usuario u = cell.getValue().getUsuario();
-            return new ReadOnlyStringWrapper(u != null ? u.getNombre() : "N/A");
-        });
+        usuarioCol.setCellValueFactory(cell -> new ReadOnlyStringWrapper(cell.getValue().getUsuario() != null ? cell.getValue().getUsuario().getNombre() : "N/A"));
         TableColumn<Envio, String> estadoCol = new TableColumn<>("Estado");
-        estadoCol.setCellValueFactory(new PropertyValueFactory<>("estado"));
+        estadoCol.setCellValueFactory(cell -> new ReadOnlyStringWrapper(cell.getValue().getEstado() != null ? cell.getValue().getEstado().toString() : ""));
         TableColumn<Envio, Double> pesoCol = new TableColumn<>("Peso");
         pesoCol.setCellValueFactory(new PropertyValueFactory<>("peso"));
         TableColumn<Envio, Double> costoCol = new TableColumn<>("Costo");
@@ -47,59 +43,45 @@ public class EnvioTab {
 
         table.getColumns().addAll(idCol, usuarioCol, estadoCol, pesoCol, costoCol);
 
-        ObservableList<Envio> items = FXCollections.observableArrayList(envioService.listarTodos());
+        List<Envio> lista = envioService.listarTodos();
+        if (!isAdmin) {
+            Usuario current = DataStore.getInstance().getCurrentUser();
+            lista = lista.stream().filter(e -> e.getUsuario() != null && current != null && e.getUsuario().getIdUsuario().equals(current.getIdUsuario())).collect(Collectors.toList());
+        }
+
+        ObservableList<Envio> items = FXCollections.observableArrayList(lista);
         table.setItems(items);
 
         Button btnNuevo = new Button("Nuevo");
         Button btnEditar = new Button("Editar");
         Button btnEliminar = new Button("Eliminar");
-        Button btnAsignar = new Button("Asignar repartidor");
+        Button btnAsignar = new Button("Asignar");
         Button btnRefrescar = new Button("Refrescar");
+
+        btnEditar.setDisable(!isAdmin);
+        btnEliminar.setDisable(!isAdmin);
+        btnAsignar.setDisable(!isAdmin);
 
         HBox controls = new HBox(10, btnNuevo, btnEditar, btnEliminar, btnAsignar, btnRefrescar);
         controls.setPadding(new Insets(10));
 
-        btnRefrescar.setOnAction(e -> items.setAll(envioService.listarTodos()));
+        btnRefrescar.setOnAction(e -> {
+            List<Envio> refreshed = envioService.listarTodos();
+            if (!isAdmin) {
+                Usuario cur = DataStore.getInstance().getCurrentUser();
+                refreshed = refreshed.stream().filter(ev -> ev.getUsuario()!=null && ev.getUsuario().getIdUsuario().equals(cur.getIdUsuario())).collect(Collectors.toList());
+            }
+            items.setAll(refreshed);
+        });
 
         btnNuevo.setOnAction(e -> {
-            EnvioFormDialog dialog = new EnvioFormDialog(null);
-            Optional<Envio> res = dialog.showAndWait();
-            res.ifPresent(envio -> {
-                envio.setFechaEstimadaEntrega(LocalDateTime.now().plusHours(3));
-                envioService.crearEnvio(envio);
-                items.setAll(envioService.listarTodos());
+            EnvioFormDialog d = new EnvioFormDialog(null);
+            Optional<Envio> r = d.showAndWait();
+            r.ifPresent(en -> {
+                if (!isAdmin) en.setUsuario(DataStore.getInstance().getCurrentUser());
+                envioService.crearEnvio(en);
+                items.setAll(envioService.listarTodos().stream().filter(ev -> isAdmin || (ev.getUsuario()!=null && ev.getUsuario().getIdUsuario().equals(DataStore.getInstance().getCurrentUser().getIdUsuario()))).collect(Collectors.toList()));
             });
-        });
-
-        btnEditar.setOnAction(e -> {
-            Envio sel = table.getSelectionModel().getSelectedItem();
-            if (sel == null) { Alerts.showWarning("Selecciona un envío para editar"); return; }
-            EnvioFormDialog dialog = new EnvioFormDialog(sel);
-            dialog.showAndWait().ifPresent(updated -> {
-                sel.setPeso(updated.getPeso());
-                sel.setVolumen(updated.getVolumen());
-                envioService.recalcularCosto(sel.getIdEnvio());
-                items.setAll(envioService.listarTodos());
-            });
-        });
-
-        btnEliminar.setOnAction(e -> {
-            Envio sel = table.getSelectionModel().getSelectedItem();
-            if (sel == null) { Alerts.showWarning("Selecciona un envío para eliminar"); return; }
-            boolean ok = Alerts.confirm("Eliminar envío", "¿Eliminar envío " + sel.getIdEnvio() + "?");
-            if (ok) {
-                DataStore.getInstance().getEnvioRepo().delete(sel.getIdEnvio());
-                items.setAll(envioService.listarTodos());
-            }
-        });
-
-        btnAsignar.setOnAction(e -> {
-            Envio sel = table.getSelectionModel().getSelectedItem();
-            if (sel == null) { Alerts.showWarning("Selecciona un envío para asignar"); return; }
-            boolean assigned = envioService.asignarRepartidor(sel);
-            if (assigned) Alerts.showInfo("Asignado", "Repartidor asignado al envío");
-            else Alerts.showWarning("No hay repartidores disponibles");
-            items.setAll(envioService.listarTodos());
         });
 
         root.setCenter(table);

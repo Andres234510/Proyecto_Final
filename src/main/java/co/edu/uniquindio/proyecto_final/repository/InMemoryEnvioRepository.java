@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 public class InMemoryEnvioRepository implements EnvioRepository {
     private final Map<String, Envio> storage = new HashMap<>();
+    private final List<Envio> Envios = new ArrayList<>();
 
     @Override
     public Envio save(Envio envio) {
@@ -42,5 +43,11 @@ public class InMemoryEnvioRepository implements EnvioRepository {
     @Override
     public void delete(String id) {
         storage.remove(id);
+    }
+
+    @Override
+    public void update(Envio envio) {
+        delete(envio.getIdEnvio());
+        Envios.add(envio);
     }
 }

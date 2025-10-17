@@ -11,4 +11,5 @@ public interface DireccionRepository {
     List<Direccion> findAll();
     List<Direccion> findByAlias(String alias);
     void delete(String id);
+    void update(Direccion d);
 }

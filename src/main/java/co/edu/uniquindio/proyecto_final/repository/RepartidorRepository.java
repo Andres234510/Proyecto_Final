@@ -13,4 +13,5 @@ public interface RepartidorRepository {
     List<Repartidor> findByZona(String zona);
     List<Repartidor> findByDisponibilidad(Disponibilidad d);
     void delete(String id);
+    void update(Repartidor r);
 }

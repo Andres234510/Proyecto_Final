@@ -11,4 +11,5 @@ public interface PagoRepository {
     List<Pago> findAll();
     List<Pago> findByEnvioId(String idEnvio);
     void delete(String id);
+    void update(Pago pago);
 }

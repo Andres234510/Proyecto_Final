@@ -6,6 +6,7 @@ import java.util.*;
 
 public class InMemoryUsuarioRepository implements UsuarioRepository {
     private final Map<String, Usuario> storage = new HashMap<>();
+    private final List<Usuario> usuarios = new ArrayList<>();
 
     @Override
     public Usuario save(Usuario u) {
@@ -26,5 +27,11 @@ public class InMemoryUsuarioRepository implements UsuarioRepository {
     @Override
     public void delete(String id) {
         storage.remove(id);
+    }
+
+    @Override
+    public void update(Usuario usuario) {
+        delete(usuario.getId());
+        usuarios.add(usuario);
     }
 }

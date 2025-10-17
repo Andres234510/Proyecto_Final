@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 public class InMemoryDireccionRepository implements DireccionRepository {
     private final Map<String, Direccion> storage = new HashMap<>();
+    private final List<Direccion> direccioness = new ArrayList<>();
 
     @Override
     public Direccion save(Direccion d) {
@@ -34,5 +35,11 @@ public class InMemoryDireccionRepository implements DireccionRepository {
     @Override
     public void delete(String id) {
         storage.remove(id);
+    }
+
+    @Override
+    public void update(Direccion d) {
+        delete(d.getIdDireccion());
+        direccioness.add(d);
     }
 }

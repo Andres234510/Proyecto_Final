@@ -23,7 +23,8 @@ public class UserViewController extends Application {
         btnListarEnvios.setOnAction(e -> {
             var envios = DataStore.getInstance().getEnvioRepo().findAll();
             StringBuilder sb = new StringBuilder();
-            envios.forEach(en -> sb.append(en.getIdEnvio()).append(" - ").append(en.getEstado()).append("\n"));
+            envios.forEach(en -> sb.append(en.getIdEnvio()).append(" - ").append(en.getEstado()).
+                    append("\n"));
             area.setText(sb.toString());
         });
 

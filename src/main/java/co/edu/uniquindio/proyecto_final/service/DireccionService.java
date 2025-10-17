@@ -4,25 +4,28 @@ import co.edu.uniquindio.proyecto_final.model.Direccion;
 import co.edu.uniquindio.proyecto_final.repository.DireccionRepository;
 
 import java.util.List;
-import java.util.Optional;
 
 public class DireccionService {
 
-    private final DireccionRepository repo;
+    private final DireccionRepository direccionRepo;
 
-    public DireccionService(DireccionRepository repo) {
-        this.repo = repo;
+    public DireccionService(DireccionRepository direccionRepo) {
+        this.direccionRepo = direccionRepo;
     }
 
-    public Direccion crearDireccion(Direccion d) {
-        return repo.save(d);
+    public void crearDireccion(Direccion d) {
+        direccionRepo.save(d);
     }
 
-    public Optional<Direccion> buscarPorId(String id) { return repo.findById(id); }
+    public void eliminarDireccion(String id) {
+        direccionRepo.delete(id);
+    }
 
-    public List<Direccion> listarTodos() { return repo.findAll(); }
+    public void actualizarDireccion(Direccion d) {
+        direccionRepo.update(d);
+    }
 
-    public Direccion actualizarDireccion(Direccion d) { return repo.save(d); }
-
-    public void eliminarDireccion(String id) { repo.delete(id); }
+    public List<Direccion> listarTodos() {
+        return direccionRepo.findAll();
+    }
 }

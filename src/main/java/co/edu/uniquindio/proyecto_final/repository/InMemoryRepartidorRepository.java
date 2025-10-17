@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 public class InMemoryRepartidorRepository implements RepartidorRepository {
     private final Map<String, Repartidor> storage = new HashMap<>();
+    private final List<Repartidor> repartidores = new ArrayList<>();
 
     @Override
     public Repartidor save(Repartidor r) {
@@ -42,5 +43,11 @@ public class InMemoryRepartidorRepository implements RepartidorRepository {
     @Override
     public void delete(String id) {
         storage.remove(id);
+    }
+
+    @Override
+    public void update(Repartidor repartidor) {
+        delete(repartidor.getId());
+        repartidores.add(repartidor);
     }
 }

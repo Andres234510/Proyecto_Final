@@ -1,12 +1,63 @@
+/* styles.css - paleta azul púrpura suave */
 .root {
-    -fx-font-family: "Segoe UI", Arial;
+    -fx-font-family: "Segoe UI", "Arial";
+    -fx-base: #fdd598;
 }
-.title {
-    -fx-font-size: 18px;
+
+/* login */
+.login-title {
+    -fx-font-size: 20px;
+    -fx-text-fill: #000000;
     -fx-font-weight: bold;
+    -fx-effect: dropshadow(two-pass-box, rgba(0,0,0,0.2), 4, 0.0, 0, 1);
 }
-.button {
-    -fx-background-radius: 8px;
-    -fx-padding: 8 12 8 12;
-    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 6, 0, 0, 2);
+
+.login-error {
+    -fx-text-fill: #ff0000;
+}
+
+/* primary button */
+.button.primary-btn {
+    -fx-background-radius: 8;
+    -fx-background-insets: 0;
+    -fx-padding: 8 18 8 18;
+    -fx-text-fill: #000000;
+    -fx-font-weight: bold;
+    -fx-background-color: linear-gradient(#6658f0, #3a39b3);
+}
+.button.primary-btn:hover {
+    -fx-background-color: linear-gradient(#7a6cf8, #5051d6);
+}
+
+/* table appearance */
+.table-view {
+    -fx-background-color: linear-gradient(#fdd598, #f4b95c);
+    -fx-border-color: transparent;
+    -fx-cell-size: 28px;
+}
+.table-view .column-header-background {
+    -fx-background-color: linear-gradient(#dfe7ff, #e9f0ff);
+}
+
+/* general pane background */
+.tab-pane .tab-content-area {
+    -fx-background-color: linear-gradient(#ffffff, #f8fbff);
+}
+
+/* inputs */
+.text-field, .password-field, .combo-box {
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+    -fx-padding: 6 8 6 8;
+}
+
+/* labels */
+.label {
+    -fx-font-size: 13px;
+}
+
+/* small help */
+.small {
+    -fx-font-size: 11px;
+    -fx-text-fill: #666;
 }

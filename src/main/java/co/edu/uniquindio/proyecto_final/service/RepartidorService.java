@@ -13,4 +13,6 @@ public interface RepartidorService {
     void actualizarDisponibilidad(String id, boolean disponible);
 
     Repartidor crearRepartidor(String nombre, String documento, String telefono, Disponibilidad disponibilidad, String zona);
+
+
 }

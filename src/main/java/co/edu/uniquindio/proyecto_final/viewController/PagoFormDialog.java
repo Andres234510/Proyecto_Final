@@ -41,4 +41,7 @@ public class PagoFormDialog extends Dialog<Pago> {
             return null;
         });
     }
+
+    public PagoFormDialog(Object o) {
+    }
 }

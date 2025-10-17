@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 public class InMemoryPagoRepository implements PagoRepository {
     private final Map<String, Pago> storage = new HashMap<>();
+    private final List<Pago> pagos = new ArrayList<>();
 
     @Override
     public Pago save(Pago p) {
@@ -34,5 +35,11 @@ public class InMemoryPagoRepository implements PagoRepository {
     @Override
     public void delete(String id) {
         storage.remove(id);
+    }
+
+    @Override
+    public void update(Pago pago) {
+        delete(pago.getIdPago());
+        pagos.add(pago);
     }
 }

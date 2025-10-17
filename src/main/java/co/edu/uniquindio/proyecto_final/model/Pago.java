@@ -26,4 +26,28 @@ public class Pago {
     public LocalDateTime getFecha() { return fecha; }
     public String getMetodo() { return metodo; }
     public ResultadoPago getResultado() { return resultado; }
+
+    public void setIdPago(String idPago) {
+        this.idPago = idPago;
+    }
+
+    public void setIdEnvio(String idEnvio) {
+        this.idEnvio = idEnvio;
+    }
+
+    public void setMonto(double monto) {
+        this.monto = monto;
+    }
+
+    public void setFecha(LocalDateTime fecha) {
+        this.fecha = fecha;
+    }
+
+    public void setMetodo(String metodo) {
+        this.metodo = metodo;
+    }
+
+    public void setResultado(ResultadoPago resultado) {
+        this.resultado = resultado;
+    }
 }

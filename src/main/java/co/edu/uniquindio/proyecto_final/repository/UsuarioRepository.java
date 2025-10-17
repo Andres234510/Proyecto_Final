@@ -10,4 +10,5 @@ public interface UsuarioRepository {
     Optional<Usuario> findById(String id);
     List<Usuario> findAll();
     void delete(String id);
+    void update(Usuario usuario);
 }

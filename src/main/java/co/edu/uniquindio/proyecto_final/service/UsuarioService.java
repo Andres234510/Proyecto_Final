@@ -19,8 +19,8 @@ public class UsuarioService {
         this.direccionRepo = direccionRepo;
     }
 
-    public Usuario crearUsuario(String nombre, String correo, String telefono) {
-        Usuario u = new Usuario(nombre, correo, telefono);
+    public Usuario crearUsuario(String nombre, String correo, String telefono, String password) {
+        Usuario u = new Usuario(nombre, correo, telefono, password);
         return usuarioRepo.save(u);
     }
 
