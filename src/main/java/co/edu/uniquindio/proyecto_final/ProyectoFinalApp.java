@@ -18,7 +18,6 @@ public class ProyectoFinalApp extends Application {
         DataStore ds = DataStore.getInstance();
         ds.initSampleData();
 
-        // Mostrar login modal
         LoginView loginView = new LoginView();
         Optional<Usuario> logged = loginView.showAndWait();
 
@@ -28,9 +27,11 @@ public class ProyectoFinalApp extends Application {
         }
 
         Usuario user = logged.get();
+
         primaryStage.setTitle("Plataforma - Usuario: " + user.getNombre());
 
         TabPane tabPane = new TabPane();
+
         boolean isAdmin = user.isAdmin();
 
         if (isAdmin) {
@@ -39,9 +40,13 @@ public class ProyectoFinalApp extends Application {
             tabPane.getTabs().add(RepartidorTab.createTab(true));
             tabPane.getTabs().add(PagoTab.createTab(true));
             tabPane.getTabs().add(DireccionTab.createTab(true));
+
+            tabPane.getTabs().add(Parcial2Tab.createTab(true));
         } else {
             tabPane.getTabs().add(EnvioTab.createTab(false));
             tabPane.getTabs().add(ProfileTab.createTab());
+
+            tabPane.getTabs().add(Parcial2Tab.createTab(false));
         }
 
         tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
@@ -50,18 +55,15 @@ public class ProyectoFinalApp extends Application {
 
         String cssPath = "/co/edu/uniquindio/proyecto_final/css/style.css";
         URL cssUrl = getClass().getResource(cssPath);
-
         if (cssUrl != null) {
             scene.getStylesheets().add(cssUrl.toExternalForm());
         } else {
-            System.err.println("⚠️ No se encontró " + cssPath + ". Verifica src/main/resources.");
+            System.err.println("WARNING: no se encontró " + cssPath + " en classpath. Verifica src/main/resources.");
         }
 
         primaryStage.setScene(scene);
         primaryStage.show();
     }
 
-    public static void main(String[] args) {
-        launch(args);
-    }
+    public static void main(String[] args) { launch(args); }
 }

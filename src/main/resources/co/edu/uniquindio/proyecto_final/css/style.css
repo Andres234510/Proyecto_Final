@@ -26,7 +26,7 @@
     -fx-background-color: linear-gradient(#6658f0, #3a39b3);
 }
 .button.primary-btn:hover {
-    -fx-background-color: linear-gradient(#7a6cf8, #5051d6);
+    -fx-background-color: linear-gradient(#ff0000, #612222);
 }
 
 /* table appearance */
