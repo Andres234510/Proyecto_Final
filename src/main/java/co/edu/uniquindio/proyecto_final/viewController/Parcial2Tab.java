@@ -14,12 +14,7 @@ import javafx.scene.text.Text;
 import java.text.DecimalFormat;
 import java.util.UUID;
 
-/**
- * Parcial2Tab (corregido)
- * - Evita PropertyValueFactory/reflection usando lambdas con ReadOnlyStringWrapper
- * - Implementa Strategy, Decorator y Factory Method (ShipmentProcessorFactory)
- * - Actualiza correctamente la tabla con ObservableList
- */
+
 public class Parcial2Tab {
 
     public static Tab createTab(boolean isAdmin) {
@@ -27,7 +22,6 @@ public class Parcial2Tab {
         BorderPane root = new BorderPane();
         root.setPadding(new Insets(10));
 
-        // Top: título y subtítulo
         VBox topBox = new VBox(6);
         Text title = new Text("Parcial 2 — Simulación de Patrones");
         title.setFont(Font.font("System", FontWeight.BOLD, 18));
@@ -318,8 +312,13 @@ public class Parcial2Tab {
         @Override
         public double getCost(){return wrap.getCost()*1.20;} }
 
-    public interface ShipmentProcessor { FacadeReport process(double weight, double distance); }
-    public static abstract class ShipmentProcessorFactory { public abstract ShipmentProcessor createProcessor(); }
+    public interface ShipmentProcessor {
+        FacadeReport process(double weight, double distance);
+    }
+    public static abstract class ShipmentProcessorFactory {
+        public abstract ShipmentProcessor createProcessor();
+    }
+
 
     public static class PesoShipmentFactory extends ShipmentProcessorFactory {
         @Override public ShipmentProcessor createProcessor() {
