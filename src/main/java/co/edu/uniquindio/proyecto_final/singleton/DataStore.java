@@ -71,21 +71,21 @@ public class DataStore {
 
             // 🔹 Crear usuario administrador
             Usuario admin = usuarioService.crearUsuario(
-                    "Administrador", "admin@example.com", "3100000000", "admin123"
+                    "Administrador", "admin@ejemplo.com", "3100000000", "admin123"
             );
             admin.setAdmin(true);
             usuarioRepo.save(admin);
 
             // 🔹 Usuario normal 1
             Usuario u1 = usuarioService.crearUsuario(
-                    "Ana Perez", "ana@example.com", "3101111111", "1234"
+                    "Ana Perez", "ana@ejemplo.com", "3101111111", "1234"
             );
             usuarioService.agregarDireccionAUsuario(u1.getIdUsuario(),
                     new Direccion("Casa", "Cl 10 #5-20", "Bogota", 4.6, -74.07));
 
             // 🔹 Usuario normal 2
             Usuario u2 = usuarioService.crearUsuario(
-                    "Luis Gomez", "luis@example.com", "3102222222", "12345"
+                    "Luis Gomez", "luis@ejemplo.com", "3102222222", "12345"
             );
             usuarioService.agregarDireccionAUsuario(u2.getIdUsuario(),
                     new Direccion("Oficina", "Av 9 #34-56", "Bogota", 4.65, -74.05));
