@@ -139,7 +139,6 @@ public class Parcial2Tab {
 
         DecimalFormat fmt = new DecimalFormat("#0.00");
 
-        // Handlers
         stratCompute.setOnAction(e -> {
             try {
                 double w = Double.parseDouble(weightField.getText().trim());
@@ -292,25 +291,55 @@ public class Parcial2Tab {
         }
     }
 
-    public interface TarifaComponent { double getCost(); }
-    public static class TarifaBase implements TarifaComponent { private final double base; public
-    TarifaBase(double b){this.base=b;}
+    public interface TarifaComponent {
+        double getCost();
+    }
+
+    public static class TarifaBase implements TarifaComponent {
+        private final double base;
+        public TarifaBase(double b)
+        {this.base=b;
+        }
         @Override
         public double getCost(){return base;} }
-    public static abstract class TarifaDecorator implements TarifaComponent { protected final
-    TarifaComponent wrap; public TarifaDecorator(TarifaComponent w){this.wrap=w;}
+
+    public static abstract class TarifaDecorator implements TarifaComponent {
+        protected final TarifaComponent wrap;
+        public TarifaDecorator(TarifaComponent w){
+            this.wrap=w;
+        }
         @Override
-        public double
-    getCost(){return wrap.getCost();} }
-    public static class SeguroDecorator extends TarifaDecorator { public SeguroDecorator(TarifaComponent w){super(w);}
+        public double getCost(){
+            return wrap.getCost();
+        }
+    }
+    public static class SeguroDecorator extends TarifaDecorator
+    { public SeguroDecorator(TarifaComponent w){
+        super(w);
+    }
         @Override
-        public double getCost(){return wrap.getCost()*1.10;} }
-    public static class RastreoDecorator extends TarifaDecorator { public RastreoDecorator(TarifaComponent w){super(w);}
+        public double getCost(){
+        return wrap.getCost()*1.10;
+    }
+    }
+    public static class RastreoDecorator extends TarifaDecorator {
+        public RastreoDecorator(TarifaComponent w){
+            super(w);
+        }
         @Override
-        public double getCost(){return wrap.getCost()*1.05;} }
-    public static class NocturnoDecorator extends TarifaDecorator { public NocturnoDecorator(TarifaComponent w){super(w);}
+        public double getCost(){
+            return wrap.getCost()*1.05;
+        }
+    }
+    public static class NocturnoDecorator extends TarifaDecorator {
+        public NocturnoDecorator(TarifaComponent w){
+            super(w);
+        }
         @Override
-        public double getCost(){return wrap.getCost()*1.20;} }
+        public double getCost(){return wrap.getCost()*1.20;}
+    }
+
+
 
     public interface ShipmentProcessor {
         FacadeReport process(double weight, double distance);
