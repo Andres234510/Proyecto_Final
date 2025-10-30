@@ -1,63 +1,103 @@
-/* styles.css - paleta azul púrpura suave */
 .root {
     -fx-font-family: "Segoe UI", "Arial";
-    -fx-base: #fdd598;
+    -fx-base: #f4f4f6;
+    -fx-background-color: linear-gradient(to bottom, #f6f7f9, #e3e4e8);
 }
 
-/* login */
-.login-title {
-    -fx-font-size: 20px;
-    -fx-text-fill: #000000;
+/* títulos */
+.title {
+    -fx-font-size: 22px;
+    -fx-text-fill: #333333;
     -fx-font-weight: bold;
-    -fx-effect: dropshadow(two-pass-box, rgba(0,0,0,0.2), 4, 0.0, 0, 1);
+    -fx-padding: 10 0 15 0;
 }
 
-.login-error {
-    -fx-text-fill: #ff0000;
-}
-
-/* primary button */
-.button.primary-btn {
+/* botones generales */
+.button {
+    -fx-background-color: linear-gradient(to bottom, #f0f0f0, #dcdcdc);
+    -fx-text-fill: #333333;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
     -fx-background-radius: 8;
-    -fx-background-insets: 0;
-    -fx-padding: 8 18 8 18;
-    -fx-text-fill: #000000;
+    -fx-border-radius: 8;
+    -fx-border-color: #c0c0c0;
+    -fx-padding: 10 20 10 20;
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-background-color: linear-gradient(to bottom, #ffffff, #c8c8c8);
+}
+
+/* botones primarios */
+.button.primary-btn {
+    -fx-background-color: linear-gradient(to bottom, #4a6cf7, #364fc7);
+    -fx-text-fill: white;
     -fx-font-weight: bold;
-    -fx-background-color: linear-gradient(#6658f0, #3a39b3);
 }
+
 .button.primary-btn:hover {
-    -fx-background-color: linear-gradient(#ff0000, #612222);
+    -fx-background-color: linear-gradient(to bottom, #668cff, #4a6cf7);
 }
 
-/* table appearance */
+/* contenedores */
+.hbox, .vbox {
+    -fx-alignment: center;
+    -fx-spacing: 15;
+    -fx-padding: 20;
+}
+
+/* tablas */
 .table-view {
-    -fx-background-color: linear-gradient(#fdd598, #f4b95c);
-    -fx-border-color: transparent;
-    -fx-cell-size: 28px;
-}
-.table-view .column-header-background {
-    -fx-background-color: linear-gradient(#dfe7ff, #e9f0ff);
+    -fx-background-color: white;
+    -fx-border-color: #cccccc;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-table-cell-border-color: transparent;
 }
 
-/* general pane background */
-.tab-pane .tab-content-area {
-    -fx-background-color: linear-gradient(#ffffff, #f8fbff);
+.table-view .column-header-background {
+    -fx-background-color: linear-gradient(to bottom, #e8e8e8, #d0d0d0);
+}
+
+.table-view .column-header,
+.table-view .filler {
+    -fx-border-color: #c8c8c8;
+    -fx-border-width: 0 0 1 0;
+}
+
+.table-view .cell {
+    -fx-padding: 8;
 }
 
 /* inputs */
-.text-field, .password-field, .combo-box {
-    -fx-background-radius: 6;
+.text-field, .password-field {
+    -fx-background-color: white;
+    -fx-border-color: #cccccc;
     -fx-border-radius: 6;
+    -fx-background-radius: 6;
     -fx-padding: 6 8 6 8;
 }
 
 /* labels */
 .label {
-    -fx-font-size: 13px;
+    -fx-font-size: 14px;
+    -fx-text-fill: #333333;
 }
 
-/* small help */
-.small {
-    -fx-font-size: 11px;
-    -fx-text-fill: #666;
+/* TabPane */
+.tab-pane .tab-header-area {
+    -fx-background-color: linear-gradient(to bottom, #e9e9eb, #d5d5d7);
+}
+
+.tab-pane .tab-label {
+    -fx-font-weight: bold;
+}
+
+.tab-pane .tab:selected {
+    -fx-background-color: linear-gradient(to bottom, #4a6cf7, #364fc7);
+}
+
+.tab-pane .tab:selected .tab-label {
+    -fx-text-fill: white;
 }

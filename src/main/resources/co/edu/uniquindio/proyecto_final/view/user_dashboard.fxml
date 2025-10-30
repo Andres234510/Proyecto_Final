@@ -1,11 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
-<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-      fx:controller="co.edu.uniquindio.proyecto_final.controller.UserDashboardController" spacing="10" alignment="CENTER">
-    <Label text="Dashboard Usuario" styleClass="title"/>
-    <HBox spacing="10">
-        <Button fx:id="btnSolicitar" text="Solicitar Envío" onAction="#onSolicitar"/>
-        <Button fx:id="btnMisEnvios" text="Mis envíos" onAction="#onMisEnvios"/>
+<?import javafx.geometry.*?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="co.edu.uniquindio.proyecto_final.controller.UserDashboardController"
+      spacing="20"
+      alignment="CENTER"
+      styleClass="vbox">
+
+    <Label text="Panel del Usuario" styleClass="title"/>
+
+    <HBox spacing="20" alignment="CENTER">
+        <Button fx:id="btnSolicitar" text="Solicitar Envío" onAction="#onSolicitar" />
+        <Button fx:id="btnMisEnvios" text="Mis Envíos" onAction="#onMisEnvios" />
     </HBox>
+
+
 </VBox>
