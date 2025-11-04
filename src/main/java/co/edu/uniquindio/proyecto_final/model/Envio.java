@@ -18,6 +18,7 @@ public class Envio {
     private Repartidor repartidor;
     private Usuario usuario;
     private List<ServicioAdicional> servicios = new ArrayList<>();
+    private boolean prioridad;
 
     public Envio() {
         this.idEnvio = UUID.randomUUID().toString();
@@ -67,4 +68,12 @@ public class Envio {
 
     public void setIdEnvio(String id) { this.idEnvio = id; }
     public void setId(String id) { this.idEnvio = id; }
+
+    public void setPrioridad(boolean prioridad) {
+        this.prioridad = prioridad;
+    }
+
+    public boolean isPrioridad() {
+        return prioridad;
+    }
 }

@@ -29,13 +29,13 @@ public class EnvioServiceImpl implements EnvioService {
         return envioRepo.save(envio);
     }
 
-    public Envio actualizar(Envio envio) {
+    public Envio actualizarEnvio(Envio envio) {
         double costo = tarifaService.calcularCostoEstimado(envio);
         envio.setCosto(costo);
         return envioRepo.save(envio);
     }
 
-    public void eliminar(String idEnvio) {
+    public void eliminarEnvio(String idEnvio) {
         envioRepo.delete(idEnvio);
     }
 

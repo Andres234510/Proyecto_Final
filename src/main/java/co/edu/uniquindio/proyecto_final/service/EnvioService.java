@@ -29,4 +29,8 @@ public interface EnvioService {
     void recalcularCosto(String idEnvio);
 
     List<Envio> listarPorUsuario(String usuarioId);
+
+    Envio actualizarEnvio(Envio sel);
+
+    void eliminarEnvio(String idEnvio);
 }
