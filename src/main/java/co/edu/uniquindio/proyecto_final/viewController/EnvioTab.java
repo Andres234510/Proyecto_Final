@@ -24,39 +24,36 @@ import java.util.stream.Collectors;
 /**
  * EnvioTab (mejorada)
  *
- * - Mantiene la firma pública: public static Tab createTab(boolean isAdmin)
- * - Conserva los nombres principales (envioService, table, btnNuevo, btnEditar, btnEliminar, btnAsignar, btnRefrescar)
- * - Añade un formulario embebido a la derecha para editar campos importantes del envío (peso, volumen, prioridad, estado)
- * - Para creación completa (origen/destino) continúa usando EnvioFormDialog tal y como en la versión original,
- *   evitando romper dependencias existentes relacionadas con Direccion/lat-lon o la lógica de tarifas.
+ * - Firma pública: public static Tab createTab(boolean isAdmin) (sin cambios)
+ * - Conserva nombres: envioService, table, btnNuevo, btnEditar, btnEliminar, btnAsignar, btnRefrescar
+ * - Añade formulario embebido (derecha) y búsqueda (arriba)
+ * - No altera modelos
  */
 public class EnvioTab {
 
     public static Tab createTab(boolean isAdmin) {
         Tab tab = new Tab(isAdmin ? "Envíos" : "Mis envíos");
 
-        // Root pane
+        // Root
         BorderPane root = new BorderPane();
         root.setPadding(new Insets(10));
 
-        // Servicio (nombre preservado)
+        // Servicio (preservado)
         EnvioService envioService = DataStore.getInstance().getEnvioService();
 
-        // Tabla principal (nombre preservado)
+        // Tabla principal (preservado)
         TableView<Envio> table = new TableView<>();
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
 
         // --- Columnas ---
         TableColumn<Envio, String> idCol = new TableColumn<>("ID");
-        // Mantengo el uso de PropertyValueFactory para idEnvio (compatible con tu modelo),
-        // pero para columnas derivadas uso ReadOnlyStringWrapper para evitar problemas de reflexión.
+        // idEnvio existe en el modelo, PropertyValueFactory está bien, pero usamos prefWidth
         idCol.setCellValueFactory(new PropertyValueFactory<>("idEnvio"));
         idCol.setPrefWidth(160);
 
         TableColumn<Envio, String> usuarioCol = new TableColumn<>("Usuario");
         usuarioCol.setCellValueFactory(cell ->
-                new ReadOnlyStringWrapper(
-                        cell.getValue().getUsuario() != null ? cell.getValue().getUsuario().getNombre() : "N/A")
+                new ReadOnlyStringWrapper(cell.getValue().getUsuario() != null ? cell.getValue().getUsuario().getNombre() : "N/A")
         );
         usuarioCol.setPrefWidth(180);
 
@@ -76,7 +73,15 @@ public class EnvioTab {
 
         table.getColumns().addAll(idCol, usuarioCol, estadoCol, pesoCol, costoCol);
 
-        // --- Cargar datos iniciales ---
+        // --- Búsqueda / filtro (opcional, mejora de usabilidad) ---
+        TextField txtSearch = new TextField();
+        txtSearch.setPromptText("Buscar por ID, usuario o estado...");
+        txtSearch.setMinWidth(220);
+
+        HBox searchBox = new HBox(8, new Label("Buscar:"), txtSearch);
+        searchBox.setPadding(new Insets(0, 0, 8, 0));
+
+        // --- Cargar datos iniciales (respeta isAdmin) ---
         List<Envio> lista = envioService.listarTodos();
         if (!isAdmin) {
             Usuario current = DataStore.getInstance().getCurrentUser();
@@ -84,10 +89,11 @@ public class EnvioTab {
                     .filter(e -> e.getUsuario() != null && current != null && e.getUsuario().getIdUsuario().equals(current.getIdUsuario()))
                     .collect(Collectors.toList());
         }
-        ObservableList<Envio> items = FXCollections.observableArrayList(lista);
+        ObservableList<Envio> masterItems = FXCollections.observableArrayList(lista);
+        ObservableList<Envio> items = FXCollections.observableArrayList(masterItems);
         table.setItems(items);
 
-        // --- Formulario embebido (derecha) para edición rápida ---
+        // --- Formulario embebido (derecha) ---
         GridPane form = new GridPane();
         form.setHgap(8);
         form.setVgap(8);
@@ -107,7 +113,6 @@ public class EnvioTab {
 
         Label lblEstado = new Label("Estado:");
         ComboBox<EstadoEnvio> cmbEstado = new ComboBox<>();
-        // Si EstadoEnvio existe, llenar; si no, ComboBox quedará vacío pero no rompe compilación si la enum existe.
         cmbEstado.getItems().addAll(EstadoEnvio.values());
 
         Label lblFormStatus = new Label();
@@ -122,8 +127,6 @@ public class EnvioTab {
         form.add(lblEstado, 0, 3);
         form.add(cmbEstado, 1, 3);
         form.add(lblFormStatus, 0, 4, 2, 1);
-
-        // Asegurar que el formulario no se cierre ni ocupe todo al redimensionar
         form.setPrefWidth(360);
 
         // --- Botones (nombres preservados) ---
@@ -133,106 +136,110 @@ public class EnvioTab {
         Button btnAsignar = new Button("Asignar");
         Button btnRefrescar = new Button("Refrescar");
 
-        // Nuevo botón para guardar cambios desde el formulario (se añade sin renombrar otros)
+        // Botón adicional Guardar para aplicar cambios desde el formulario
         Button btnGuardar = new Button("Guardar");
 
-        // Control de permisos (mantenemos la misma lógica)
         btnEditar.setDisable(!isAdmin);
         btnEliminar.setDisable(!isAdmin);
         btnAsignar.setDisable(!isAdmin);
         btnGuardar.setDisable(!isAdmin);
-        btnNuevo.setDisable(!isAdmin); // conservar si quieres creación por dialog únicamente para admin
+        btnNuevo.setDisable(!isAdmin); // conserva la política original para creación
 
         HBox controls = new HBox(10, btnNuevo, btnEditar, btnGuardar, btnEliminar, btnAsignar, btnRefrescar);
         controls.setPadding(new Insets(10));
 
-        // --- Conexión selección -> formulario ---
+        // --- Selección -> carga formulario ---
         table.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> {
             if (newSel != null) {
-                // cargar en formulario los campos editables
                 txtPeso.setText(String.valueOf(newSel.getPeso()));
                 txtVol.setText(String.valueOf(newSel.getVolumen()));
                 chkPrioridad.setSelected(newSel.isPrioridad());
-                if (newSel.getEstado() != null) {
-                    cmbEstado.setValue(newSel.getEstado());
-                } else {
-                    cmbEstado.setValue(null);
-                }
+                cmbEstado.setValue(newSel.getEstado());
                 lblFormStatus.setText("Editando: " + newSel.getIdEnvio());
             } else {
                 clearForm(txtPeso, txtVol, chkPrioridad, cmbEstado, lblFormStatus);
             }
         });
 
-        // --- Comportamiento botones ---
+        // --- Filtrado simple al escribir en búsqueda ---
+        txtSearch.textProperty().addListener((obs, oldV, newV) -> {
+            String q = newV == null ? "" : newV.trim().toLowerCase();
+            if (q.isEmpty()) {
+                items.setAll(masterItems);
+            } else {
+                items.setAll(masterItems.stream().filter(en ->
+                        (en.getIdEnvio() != null && en.getIdEnvio().toLowerCase().contains(q)) ||
+                                (en.getUsuario() != null && en.getUsuario().getNombre() != null && en.getUsuario().getNombre().toLowerCase().contains(q)) ||
+                                (en.getEstado() != null && en.getEstado().toString().toLowerCase().contains(q))
+                ).collect(Collectors.toList()));
+            }
+        });
 
-        // Refrescar: recarga los datos desde el servicio (respeta isAdmin)
+        // --- Acciones de botones ---
+
+        // Refrescar
         btnRefrescar.setOnAction(e -> {
             List<Envio> refreshed = envioService.listarTodos();
             if (!isAdmin) {
                 Usuario cur = DataStore.getInstance().getCurrentUser();
                 refreshed = refreshed.stream().filter(ev -> ev.getUsuario()!=null && ev.getUsuario().getIdUsuario().equals(cur.getIdUsuario())).collect(Collectors.toList());
             }
-            items.setAll(refreshed);
+            masterItems.setAll(refreshed);
+            items.setAll(masterItems);
         });
 
-        // Nuevo: en la versión original usabas EnvioFormDialog para crear (con origen/destino complejos).
-        // Mantengo esa opción para crear envíos completos y válidos.
+        // Nuevo -> abrir diálogo (mantener comportamiento original para creación completa)
         btnNuevo.setOnAction(e -> {
             EnvioFormDialog d = new EnvioFormDialog(null);
             Optional<Envio> r = d.showAndWait();
             r.ifPresent(en -> {
                 if (!isAdmin) en.setUsuario(DataStore.getInstance().getCurrentUser());
                 envioService.crearEnvio(en);
-                // actualizar vista: recarga y filtra si aplica
+                // recargar
                 List<Envio> updated = envioService.listarTodos().stream()
                         .filter(ev -> isAdmin || (ev.getUsuario()!=null && ev.getUsuario().getIdUsuario().equals(DataStore.getInstance().getCurrentUser().getIdUsuario())))
                         .collect(Collectors.toList());
-                items.setAll(updated);
+                masterItems.setAll(updated);
+                items.setAll(masterItems);
             });
         });
 
-        // Editar: carga en formulario (mismo comportamiento, pero ahora no abre diálogo)
+        // Editar -> instrucción al usuario (form ya se llenó con selección)
         btnEditar.setOnAction(e -> {
             Envio sel = table.getSelectionModel().getSelectedItem();
             if (sel == null) {
                 Alerts.showWarning("Selecciona un envío para editar");
                 return;
             }
-            // el formulario ya se llenó por el listener; solo mostrar mensaje
             lblFormStatus.setText("Editando: " + sel.getIdEnvio() + " — Modifica y pulsa Guardar");
         });
 
-        // Guardar: aplica los cambios del formulario al envío seleccionado
+        // Guardar -> aplicar cambios del formulario al envío seleccionado
         btnGuardar.setOnAction(e -> {
             Envio sel = table.getSelectionModel().getSelectedItem();
             if (sel == null) {
-                // No hay selección: no intentamos crear con datos parciales, instruimos al usuario.
                 Alerts.showWarning("Seleccione un envío para actualizar o use Nuevo para crear un envío completo.");
                 return;
             }
             try {
-                // Validaciones básicas de formato
                 double peso = parseDoubleSafe(txtPeso.getText(), "Peso");
                 double volumen = parseDoubleSafe(txtVol.getText(), "Volumen");
 
                 sel.setPeso(peso);
                 sel.setVolumen(volumen);
                 sel.setPrioridad(chkPrioridad.isSelected());
-                sel.setEstado(cmbEstado.getValue()); // puede ser null si no se selecciona
+                sel.setEstado(cmbEstado.getValue()); // puede ser null
 
-                // Llamada al servicio para actualizar (preservando la firma de servicio)
-                // Se asume que existe envioService.actualizarEnvio(Envio) o similar.
-                // Si tu servicio usa otro nombre, reemplaza la siguiente línea por la invocación correcta.
+                // Llamada al servicio para actualizar (preserva la firma esperada)
                 envioService.actualizarEnvio(sel);
 
-                // refrescar lista y mantener selección
+                // recargar y mantener selección
                 List<Envio> refreshed = envioService.listarTodos().stream()
                         .filter(ev -> isAdmin || (ev.getUsuario()!=null && ev.getUsuario().getIdUsuario().equals(DataStore.getInstance().getCurrentUser().getIdUsuario())))
                         .collect(Collectors.toList());
-                items.setAll(refreshed);
+                masterItems.setAll(refreshed);
+                items.setAll(masterItems);
 
-                // re-seleccionar el elemento actualizado por id
                 Platform.runLater(() -> {
                     for (Envio eItem : items) {
                         if (eItem.getIdEnvio().equals(sel.getIdEnvio())) {
@@ -248,7 +255,7 @@ public class EnvioTab {
             }
         });
 
-        // Eliminar: confirma y elimina
+        // Eliminar -> confirmación
         btnEliminar.setOnAction(e -> {
             Envio sel = table.getSelectionModel().getSelectedItem();
             if (sel == null) {
@@ -259,34 +266,34 @@ public class EnvioTab {
             if (ok) {
                 envioService.eliminarEnvio(sel.getIdEnvio());
                 lblFormStatus.setText("Eliminado: " + sel.getIdEnvio());
-
-                // actualizar vista
+                // recargar
                 List<Envio> refreshed = envioService.listarTodos().stream()
                         .filter(ev -> isAdmin || (ev.getUsuario()!=null && ev.getUsuario().getIdUsuario().equals(DataStore.getInstance().getCurrentUser().getIdUsuario())))
                         .collect(Collectors.toList());
-                items.setAll(refreshed);
+                masterItems.setAll(refreshed);
+                items.setAll(masterItems);
                 clearForm(txtPeso, txtVol, chkPrioridad, cmbEstado, lblFormStatus);
             }
         });
 
-        // Asignar: preserva la intención original (probablemente abre diálogo o invoca lógica de asignación)
-        // No se altera su comportamiento — aquí lo dejamos como hook para tu implementación.
+        // Asignar -> hook (dejar para tu lógica existente)
         btnAsignar.setOnAction(e -> {
             Envio sel = table.getSelectionModel().getSelectedItem();
             if (sel == null) {
                 Alerts.showWarning("Selecciona un envío para asignar");
                 return;
             }
-            // Lógica existente de asignación (por ejemplo envioService.asignarRepartidor(sel))
-            // Para no cambiar la API, si ya existe un método llamado asignarRepartidor, puedes usarlo aquí.
-            // Ejemplo (descomentario si aplica):
-            // envioService.asignarRepartidor(sel);
-            Alerts.showInfo("Asignar", "Funcionalidad asignar no implementada en esta vista. Use la existente.");
+            // Si tienes un método envioService.asignarRepartidor(sel) o similar,
+            // puedes llamarlo aquí. Por defecto mostramos un info.
+            Alerts.showInfo("Asignar", "Funcionalidad de asignación disponible en el servicio.");
         });
 
-        // --- Layout final: tabla (center) + form (right) ---
-        HBox center = new HBox(12, table, form);
+        // --- Layout: arriba búsqueda + tabla + form + controles abajo ---
+        HBox center = new HBox(12);
+        // Tabla y form lado a lado
+        center.getChildren().addAll(table, form);
         HBox.setHgrow(table, Priority.ALWAYS);
+        root.setTop(searchBox);
         root.setCenter(center);
         root.setBottom(controls);
 

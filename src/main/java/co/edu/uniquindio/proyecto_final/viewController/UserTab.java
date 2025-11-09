@@ -7,7 +7,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.application.Platform;
@@ -22,8 +21,6 @@ import java.util.Optional;
  * - Añade un formulario embebido (lado derecho) para crear/editar sin abrir Dialogs.
  * - Añade botón "Guardar" (no existente antes) pero NO renombra ni elimina btnNuevo/btnEditar/btnEliminar/btnRefrescar.
  * - Usa lambdas para cell factories (evita problemas de reflexión en proyectos modulares).
- *
- * Nota: Si tu proyecto depende todavía de UsuarioFormDialog en otras partes, no se touch; aquí evitamos su uso.
  */
 public class UserTab {
 
@@ -40,7 +37,6 @@ public class UserTab {
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
 
         TableColumn<Usuario, String> colId = new TableColumn<>("ID");
-        // usamos lambda para obtener el id (compatibilidad con módulos/reflection)
         colId.setCellValueFactory(cell -> new ReadOnlyStringWrapper(cell.getValue().getIdUsuario()));
         colId.setPrefWidth(180);
 
@@ -144,10 +140,7 @@ public class UserTab {
         // ----------------------
         // Funciones auxiliares (lambda)
         // ----------------------
-        Runnable reloadItems = () -> {
-            // recargar desde el servicio (lista canónica)
-            Platform.runLater(() -> items.setAll(usuarioService.listarTodos()));
-        };
+        Runnable reloadItems = () -> Platform.runLater(() -> items.setAll(usuarioService.listarTodos()));
 
         // ----------------------
         // Botones comportamiento
@@ -165,7 +158,6 @@ public class UserTab {
         btnEditar.setOnAction(e -> {
             Usuario sel = table.getSelectionModel().getSelectedItem();
             if (sel == null) {
-                // preferimos usar Alerts existing helper (ya usado en el código original)
                 Alerts.showWarning("Selecciona un usuario");
                 return;
             }
